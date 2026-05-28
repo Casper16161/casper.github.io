@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Книга рецептов | Мои рецепты</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #fdf8f3;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+      color: #3e2c1c;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem 1.5rem;
+    }
+
+    .cookbook {
+      max-width: 1000px;
+      width: 100%;
+      background: #fffbf7;
+      border-radius: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 10px 15px rgba(0, 0, 0, 0.05);
+      padding: 2rem 2rem 2.5rem;
+      border: 1px solid #f0e2d0;
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 2.2rem;
+      font-weight: 500;
+      color: #5e3a1c;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.5px;
+      border-bottom: 2px dashed #e7cfb4;
+      padding-bottom: 0.7rem;
+    }
+    h1 span {
+      font-size: 2rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      background: #f9efe2;
+      padding: 0.5rem;
+      border-radius: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      flex: 1 1 auto;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #7b5e42;
+      border-radius: 2.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: #8b4a23;
+      box-shadow: 0 4px 12px rgba(139, 74, 35, 0.15);
+      border: 1px solid #ddb797;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fade {
+      from { opacity: 0.3; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-panel {
+      background: #fff7ef;
+      border-radius: 2rem;
+      padding: 1.8rem;
+      margin-bottom: 2rem;
+      border: 1px solid #efdbc6;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      color: #6b4c32;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    input, textarea {
+      background: #ffffff;
+      border: 1px solid #e2cdb3;
+      border-radius: 1.2rem;
+      padding: 0.8rem 1rem;
+      font-size: 1rem;
+      font-family: inherit;
+      color: #3a2a1a;
+      transition: 0.2s;
+      outline: none;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #c28a5c;
+      box-shadow: 0 0 0 3px rgba(194, 138, 92, 0.2);
+    }
+
+    .btn {
+      background: #c48b5b;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.85rem 1.8rem;
+      border-radius: 2.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      background: #b57847;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      box-shadow: 0 5px 14px rgba(181, 120, 71, 0.3);
+      border: 1px solid #ac7a55;
+      letter-spacing: 0.3px;
+    }
+
+    .btn:hover {
+      background: #a56839;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .recipes-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+
+    .recipe-card {
+      background: #ffffff;
+      border: 1px solid #eddccb;
+      border-radius: 2rem;
+      padding: 1.4rem 1.6rem;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.03);
+      transition: 0.15s ease;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .recipe-card:hover {
+      border-color: #cd9f7a;
+      box-shadow: 0 10px 18px rgba(160, 110, 60, 0.08);
+    }
+
+    .recipe-info {
+      flex: 2 1 60%;
+    }
+
+    .recipe-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #5d3a1e;
+      margin-bottom: 0.3rem;
+      word-break: break-word;
+    }
+
+    .recipe-meta {
+      font-size: 0.85rem;
+      color: #9b7a5c;
+      margin-bottom: 0.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .recipe-ingredients {
+      background: #faf5ed;
+      padding: 0.7rem 1rem;
+      border-radius: 1.2rem;
+      margin: 0.6rem 0 0.8rem;
+      font-size: 0.95rem;
+      color: #3f2d1a;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .recipe-instructions {
+      font-size: 0.95rem;
+      color: #4e3b28;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .delete-btn {
+      background: none;
+      border: 1px solid #e5c5a5;
+      background: #fff4ea;
+      color: #9a5c3a;
+      padding: 0.5rem 1.1rem;
+      border-radius: 2rem;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      align-self: center;
+      white-space: nowrap;
+    }
+
+    .delete-btn:hover {
+      background: #f8e0cd;
+      border-color: #bc7a4e;
+      color: #5f3320;
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #ab8e74;
+      background: #fff9f3;
+      border-radius: 2rem;
+      font-style: italic;
+    }
+
+    .counter-badge {
+      background: #e7cfb4;
+      color: #4a3320;
+      border-radius: 2rem;
+      padding: 0.2rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 1rem 0.8rem;
+      }
+      .cookbook {
+        padding: 1.5rem;
+      }
+      .recipe-card {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cookbook">
+    <h1>
+      <span>📖</span> Книга рецептов
+    </h1>
+
+    <!-- Вкладки -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tabAddBtn">➕ Добавить рецепт</button>
+      <button class="tab-btn" id="tabListBtn">📋 Мои рецепты <span id="recipeCount" class="counter-badge">0</span></button>
+    </div>
+
+    <!-- Вкладка: Добавление -->
+    <div class="tab-content active" id="addTab">
+      <div class="form-panel">
+        <div class="form-group">
+          <label>🍲 Название блюда</label>
+          <input type="text" id="recipeName" placeholder="Например, яблочный пирог" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>⏱️ Время приготовления</label>
+          <input type="text" id="recipeTime" placeholder="45 минут" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>🥕 Ингредиенты</label>
+          <textarea id="recipeIngredients" rows="3" placeholder="Каждый ингредиент с новой строки..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>📝 Инструкция</label>
+          <textarea id="recipeInstructions" rows="4" placeholder="Пошаговое описание приготовления..."></textarea>
+        </div>
+        <button class="btn" id="saveRecipeBtn">💾 Сохранить рецепт</button>
+      </div>
+      <div style="color:#886b4d; font-size:0.9rem; margin-top:0.3rem;">
+        * Все рецепты сохраняются в памяти браузера.
+      </div>
+    </div>
+
+    <!-- Вкладка: Список рецептов -->
+    <div class="tab-content" id="listTab">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <h2 style="font-weight: 500; font-size: 1.5rem; color:#5d3c1c;">📌 Сохранённые рецепты</h2>
+        <button class="btn" id="clearAllBtn" style="background:#e7d3bc; color:#4f3a26; box-shadow:none; border-color:#cfb595;">🗑️ Очистить всё</button>
+      </div>
+      <div id="recipesContainer" class="recipes-grid">
+        <!-- Динамическое содержимое -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- Ключ для Local Storage ----------
+      const STORAGE_KEY = 'my_cookbook_recipes';
+
+      // ---------- DOM элементы ----------
+      const tabAddBtn = document.getElementById('tabAddBtn');
+      const tabListBtn = document.getElementById('tabListBtn');
+      const addTab = document.getElementById('addTab');
+      const listTab = document.getElementById('listTab');
+      const recipeCountSpan = document.getElementById('recipeCount');
+
+      // Форма
+      const nameInput = document.getElementById('recipeName');
+      const timeInput = document.getElementById('recipeTime');
+      const ingredientsInput = document.getElementById('recipeIngredients');
+      const instructionsInput = document.getElementById('recipeInstructions');
+      const saveBtn = document.getElementById('saveRecipeBtn');
+
+      // Контейнер рецептов и кнопка очистки
+      const recipesContainer = document.getElementById('recipesContainer');
+      const clearAllBtn = document.getElementById('clearAllBtn');
+
+      // ---------- Состояние ----------
+      let recipes = [];
+
+      // ---------- Загрузка из Local Storage ----------
+      function loadRecipes() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          try {
+            recipes = JSON.parse(stored);
+            // Убедимся, что это массив
+            if (!Array.isArray(recipes)) {
+              recipes = [];
+            }
+          } catch (e) {
+            console.warn('Ошибка чтения рецептов, сбрасываем.');
+            recipes = [];
+          }
+        } else {
+          recipes = [];
+        }
+      }
+
+      // ---------- Сохранение в Local Storage ----------
+      function saveRecipesToStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+      }
+
+      // ---------- Обновление счётчика и интерфейса ----------
+      function updateRecipeCount() {
+        const count = recipes.length;
+        recipeCountSpan.textContent = count;
+      }
+
+      // ---------- Рендер списка рецептов ----------
+      function renderRecipes() {
+        if (!recipesContainer) return;
+        
+        if (recipes.length === 0) {
+          recipesContainer.innerHTML = `<div class="empty-message">✨ Здесь пока нет ни одного рецепта. Добавьте первый на вкладке «Добавить рецепт».</div>`;
+          updateRecipeCount();
+          return;
+        }
+
+        let html = '';
+        recipes.forEach((recipe, index) => {
+          // Безопасное отображение (экранирование не требуется, т.к. не используется innerHTML с пользовательским вводом через шаблонные литералы? 
+          // Чтобы избежать XSS, используем textContent при вставке, но здесь создаём через innerHTML, поэтому экранируем.)
+          const escapedName = escapeHtml(recipe.name || 'Без названия');
+          const escapedTime = escapeHtml(recipe.time || '—');
+          const escapedIngredients = escapeHtml(recipe.ingredients || '');
+          const escapedInstructions = escapeHtml(recipe.instructions || '');
+
+          html += `
+            <div class="recipe-card" data-index="${index}">
+              <div class="recipe-info">
+                <div class="recipe-title">${escapedName}</div>
+                <div class="recipe-meta">⏱️ ${escapedTime}</div>
+                <div class="recipe-ingredients"><strong>🥕 Ингредиенты:</strong><br>${escapedIngredients || '—'}</div>
+                <div class="recipe-instructions"><strong>📝 Приготовление:</strong><br>${escapedInstructions || '—'}</div>
+              </div>
+              <button class="delete-btn" data-delete="${index}">🗑️ Удалить</button>
+            </div>
+          `;
+        });
+
+        recipesContainer.innerHTML = html;
+        updateRecipeCount();
+
+        // Добавляем обработчики удаления
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            const index = this.getAttribute('data-delete');
+            if (index !== null) {
+              deleteRecipeByIndex(parseInt(index, 10));
+            }
+          });
+        });
+      }
+
+      // Простая функция экранирования HTML
+      function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // ---------- Удаление рецепта по индексу ----------
+      function deleteRecipeByIndex(index) {
+        if (index >= 0 && index < recipes.length) {
+          recipes.splice(index, 1);
+          saveRecipesToStorage();
+          renderRecipes();
+          // Если мы на вкладке списка, просто обновляем; счётчик тоже обновлён
+        }
+      }
+
+      // ---------- Очистка всех рецептов ----------
+      function clearAllRecipes() {
+        if (recipes.length === 0) {
+          alert('Список рецептов уже пуст.');
+          return;
+        }
+        if (confirm('Вы действительно хотите удалить ВСЕ рецепты? Это действие необратимо.')) {
+          recipes = [];
+          saveRecipesToStorage();
+          renderRecipes();
+        }
+      }
+
+      // ---------- Добавление нового рецепта ----------
+      function addRecipe() {
+        // Получаем значения и обрезаем пробелы
+        const name = nameInput.value.trim();
+        const time = timeInput.value.trim();
+        const ingredients = ingredientsInput.value.trim();
+        const instructions = instructionsInput.value.trim();
+
+        // Простая валидация
+        if (!name) {
+          alert('Пожалуйста, введите название блюда.');
+          nameInput.focus();
+          return;
+        }
+        if (!ingredients && !instructions) {
+          alert('Добавьте хотя бы ингредиенты или инструкцию.');
+          ingredientsInput.focus();
+          return;
+        }
+
+        // Создаём объект рецепта
+        const newRecipe = {
+          name: name,
+          time: time || 'не указано',
+          ingredients: ingredients,
+          instructions: instructions,
+        };
+
+        recipes.push(newRecipe);
+        saveRecipesToStorage();
+
+        // Очищаем поля формы
+        nameInput.value = '';
+        timeInput.value = '';
+        ingredientsInput.value = '';
+        instructionsInput.value = '';
+
+        // Обновляем список рецептов (если он активен) и счётчик
+        renderRecipes();
+        
+        // Переключаемся на вкладку со списком рецептов, чтобы пользователь увидел результат
+        switchTab('list');
+        
+        // Небольшая обратная связь (опционально)
+        nameInput.focus(); // но вкладка уже переключена, это не страшно
+      }
+
+      // ---------- Переключение вкладок ----------
+      function switchTab(tabName) {
+        // Сбрасываем активные классы кнопок и панелей
+        [tabAddBtn, tabListBtn].forEach(btn => btn.classList.remove('active'));
+        [addTab, listTab].forEach(tab => tab.classList.remove('active'));
+
+        if (tabName === 'add') {
+          tabAddBtn.classList.add('active');
+          addTab.classList.add('active');
+        } else if (tabName === 'list') {
+          tabListBtn.classList.add('active');
+          listTab.classList.add('active');
+          // При каждом открытии списка перерисовываем (на случай изменений)
+          renderRecipes();
+        }
+      }
+
+      // ---------- Инициализация событий ----------
+      function bindEvents() {
+        // Вкладки
+        tabAddBtn.addEventListener('click', () => switchTab('add'));
+        tabListBtn.addEventListener('click', () => switchTab('list'));
+
+        // Сохранение рецепта
+        saveBtn.addEventListener('click', addRecipe);
+
+        // Возможность сохранить по Enter (удобно), но не на textarea
+        nameInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addRecipe();
+          }
+        });
+
+        // Кнопка очистки всего
+        clearAllBtn.addEventListener('click', clearAllRecipes);
+      }
+
+      // ---------- Старт ----------
+      function init() {
+        loadRecipes();
+        renderRecipes(); // на случай если вкладка list активна сразу? Она не активна по умолчанию, но счётчик обновим
+        updateRecipeCount();
+        bindEvents();
+        // По умолчанию активна вкладка добавления (уже в HTML), но убедимся
+        switchTab('add');
+      }
+
+      // Запускаем после загрузки DOM
+      init();
+    })();
+  </script>
+</body>
+</html>
